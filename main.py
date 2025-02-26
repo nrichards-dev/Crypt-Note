@@ -15,42 +15,76 @@ def click():
 
 def main():
     root = tk.Tk()
-    root.geometry('800x500')
+    
+    #layout
+
+    root.geometry('600x300')
     root.title('Crypt Note')
     root.configure(background='#262728')
+
+    left_frame = tk.Frame()
+    left_frame.config(bg='#222f3e', width=250)
+    left_frame.pack(side='left', fill='y')
+
+    right_frame = tk.Frame()
+    right_frame.config(bg='#222f3e', width=550)
+    right_frame.pack(side='left', fill='both', expand=True)
+
+    #widgets
+
+    input_box = tk.Entry(left_frame)
+    input_box.config(textvariable='entry_title')
+    input_box.pack(fill='x', padx=10, pady=(10,0))
     
-    textbox = tk.Entry()
-    textbox.insert(index=0, string='Hi')
-    #textbox.pack(anchor='nw')
+    create_btn = tk.Button(left_frame)
+    create_btn.config(bg='#10ac84', text='Create', width=25, activebackground='#393A40')
+    create_btn.pack(fill='x', padx=10, pady=(10,5))
 
-    button = tk.Button(root, text="Create")
-    button.config(command=click, bg='#484E70', activebackground='#393A40', width=10)
-    button.pack(ipadx=0, ipady=0, padx=20, pady=10, anchor='w')
+    edit_btn = tk.Button(left_frame)
+    edit_btn.config(bg='#10ac84', text='Edit', width=25, activebackground='#393A40')
+    edit_btn.pack(fill='x', padx=10)
 
-    button = tk.Button(root, text="Open")
-    button.config(command=click, bg='#484E70', activebackground='#393A40', width=10)
-    button.pack(ipadx=0, ipady=0, padx=20, pady=10, anchor='w')
+    save_btn = tk.Button(left_frame)
+    save_btn.config(bg='#10ac84', text='Save', width=25, activebackground='#393A40')
+    save_btn.pack(fill='x', padx=10)
 
-    button = tk.Button(root, text="Save")
-    button.config(command=click, bg='#484E70', activebackground='#393A40', width=10)
-    button.pack(ipadx=0, ipady=0, padx=20, pady=10, anchor='w')
+    delete_btn = tk.Button(left_frame)
+    delete_btn.config(bg='#10ac84', text='Delete', width=25, activebackground='#393A40')
+    delete_btn.pack(fill='x', padx=10)
 
-    button = tk.Button(root, text="Remove")
-    button.config(command=click, bg='#484E70', activebackground='#393A40', width=10)
-    button.pack(ipadx=0, ipady=0, padx=20, pady=10, anchor='w')
 
-    scroll_bar = tk.Scrollbar(root)
-    mylist = tk.Listbox(root, yscrollcommand = scroll_bar.set ) 
-    for line in range(1, 26): 
-        mylist.insert('end', "Geeks " + str(line)) 
-    scroll_bar.config( command = mylist.yview ) 
-    mylist.pack(ipadx=1, ipady=0, pady=5, anchor='w', side='right')
     
-    scroll_bar = tk.Scrollbar(root)
-    text_info = tk.Text(root, yscrollcommand=scroll_bar.set, height=10) 
-    text_info.pack(ipadx=0, ipady=2,side='right', anchor='n')
+
+    selection_box = tk.Listbox(left_frame, height=10, selectmode=tk.EXTENDED)
+    selection_box.pack(expand=True, fill='both', pady=10, padx=10)
+
+    selection_scroll = tk.Scrollbar(left_frame, orient=tk.VERTICAL, command=selection_box.yview)
+    selection_box['yscrollcommand'] = selection_scroll.set
+
+    selection_scroll.pack(side='left', expand=True, fill='y')
+
+    yay=['Yomama', 'joe biden', 'zeleski', 'donetsk', 'russia', 'ploy']
+    for item in yay:
+        selection_box.insert(tk.END, item)
+
+
+    # adding scrollbar 
+    editor_scroll = tk.Scrollbar(right_frame) 
+    
+    # packing scrollbar 
+    editor_scroll.pack(side='right', fill='y', padx=(0,10), pady=10) 
+    
+    editor_text = tk.Text(right_frame, 
+                    yscrollcommand=editor_scroll.set) 
+    editor_text.pack(fill='both', padx=(10,0), pady=10) 
+    
     # configuring the scrollbar 
-    scroll_bar.config(command=text_info.yview, width=50) 
+    editor_scroll.config(command=editor_text.yview) 
+
     root.mainloop()
 
+    
+
+    
+    
 main()
