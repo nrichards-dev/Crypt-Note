@@ -1,6 +1,5 @@
 import sqlite3
 
-
 DELETE_ROW = 'DELETE FROM notes WHERE note_id=(g?);'
 ADD_ROW = 'INSERT INTO notes (encrypted_data, title, salt) VALUES (?, ?, ?);'
 def connectDB():
