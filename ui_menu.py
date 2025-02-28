@@ -1,10 +1,11 @@
 import tkinter as tk
 import database as db
+import tkinter.messagebox
 
 class UI():
     def __init__(self):
         self.root = tk.Tk()
-    
+
         #layout
 
         self.root.geometry('600x300')
@@ -37,8 +38,12 @@ class UI():
         self.save_btn.config(bg='#10ac84', text='Save', width=25, activebackground='#393A40')
         self.save_btn.pack(fill='x', padx=10)
 
+        self.create_btn = tk.Button(self.left_frame)
+        self.create_btn.config(bg='#10ac84', text='Refresh', width=25, activebackground='#393A40', command=self.refresh_list)
+        self.create_btn.pack(fill='x', padx=10)
+
         self.delete_btn = tk.Button(self.left_frame)
-        self.delete_btn.config(bg='#10ac84', text='Delete', width=25, activebackground='#393A40')
+        self.delete_btn.config(bg='#10ac84', text='Delete', width=25, activebackground='#393A40', command=self.delete_note)
         self.delete_btn.pack(fill='x', padx=10)
 
         self.selection_box = tk.Listbox(self.left_frame, height=10, selectmode=tk.EXTENDED)
@@ -49,9 +54,9 @@ class UI():
 
         self.selection_scroll.pack(side='left', expand=True, fill='y')
 
-        yay=['Canada', 'Greenland', 'Iceland', 'Norway', 'Denmark', 'Sweden', 'sg', 'sgd', 'jgfjffg', 'fjhdfd']
-        for item in yay:
-            self.selection_box.insert(tk.END, item)
+        notes= db.list_all(db.connectDB())
+        for item in notes:
+            self.selection_box.insert(tk.END, item[2])
 
 
         self.editor_scroll = tk.Scrollbar(self.right_frame) 
@@ -72,3 +77,29 @@ class UI():
         else:
             title = self.get_entry()
         db.create_row(db.connectDB(), title)
+
+    def refresh_list(self):
+        self.selection_box.delete(0, 'end')
+
+        new_list = db.list_all(db.connectDB())
+        for item in new_list:
+            self.selection_box.insert(tk.END, item[2])
+
+    def delete_note(self):
+        selected = self.selection_box.curselection()
+        titles = []
+        for index in selected:
+            row = db.get_row(db.connectDB(), index)
+            if row:
+                title = row[2]
+                titles.append(title)
+        
+            
+        result=tkinter.messagebox.askquestion('Confirmation',f'Are you sure you want to delete: {titles}')
+        if result == 'yes':
+            #implement deletion in the database
+            for items in selected[::-1]:
+                self.selection_box.delete(items)
+                print(items)
+        else:
+            pass
