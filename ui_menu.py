@@ -1,6 +1,7 @@
 import tkinter as tk
 import database as db
 import tkinter.messagebox
+from tkinter import ttk
 
 class UI():
     def __init__(self):
@@ -46,18 +47,28 @@ class UI():
         self.delete_btn.config(bg='#10ac84', text='Delete', width=25, activebackground='#393A40', command=self.delete_note)
         self.delete_btn.pack(fill='x', padx=10)
 
-        self.selection_box = tk.Listbox(self.left_frame, height=10, selectmode=tk.EXTENDED)
-        self.selection_box.pack(expand=True, fill='both', pady=10, padx=10)
+        #
+        # New selection box implementation
+        #
 
-        self.selection_scroll = tk.Scrollbar(self.left_frame, orient=tk.VERTICAL, command=self.selection_box.yview)
-        self.selection_box['yscrollcommand'] = self.selection_scroll.set
+        self.notes_frame = tk.Frame(self.left_frame)
+        self.notes_list = ttk.Treeview(self.notes_frame)
+        self.notes_list['columns'] = ('id', 'Title')
 
-        self.selection_scroll.pack(side='left', expand=True, fill='y')
+        self.notes_list.column('#0', width=0, stretch=tk.NO)
+        self.notes_list.column('id', width=0, stretch=tk.NO)
+        self.notes_list.column('Title', width=25, stretch=tk.YES)
 
-        notes= db.list_all(db.connectDB())
-        for item in notes:
-            self.selection_box.insert(tk.END, item[2])
+        self.notes_list.heading("id", text="id")
+        self.notes_list.heading('Title', text='Note title')
 
+        self.notes_frame.pack(fill='x', padx=10, pady=10)
+        self.notes_list.pack(expand=True, side='left',fill='both')
+
+        self.refresh_list() #initial list populating
+        #
+        # -----------------------------------
+        #
 
         self.editor_scroll = tk.Scrollbar(self.right_frame) 
         self.editor_scroll.pack(side='right', fill='y', padx=(0,10), pady=10) 
@@ -79,11 +90,12 @@ class UI():
         db.create_row(db.connectDB(), title)
 
     def refresh_list(self):
-        self.selection_box.delete(0, 'end')
+        self.notes_list.delete(*self.notes_list.get_children())
 
         new_list = db.list_all(db.connectDB())
         for item in new_list:
-            self.selection_box.insert(tk.END, item[2])
+            print(item)
+            self.notes_list.insert('',index='end', values=(item[0],item[2]))
 
     def delete_note(self):
         selected = self.selection_box.curselection()
