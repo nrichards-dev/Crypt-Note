@@ -32,11 +32,11 @@ class UI():
         self.create_btn.pack(fill='x', padx=10, pady=(10,5))
 
         self.edit_btn = tk.Button(self.left_frame)
-        self.edit_btn.config(bg='#10ac84', text='Edit', width=25, activebackground='#393A40')
+        self.edit_btn.config(bg='#10ac84', text='Edit', width=25, activebackground='#393A40', command=self.edit_note)
         self.edit_btn.pack(fill='x', padx=10)
 
         self.save_btn = tk.Button(self.left_frame)
-        self.save_btn.config(bg='#10ac84', text='Save', width=25, activebackground='#393A40')
+        self.save_btn.config(bg='#10ac84', text='Save', width=25, activebackground='#393A40', command=self.save_note)
         self.save_btn.pack(fill='x', padx=10)
 
         self.create_btn = tk.Button(self.left_frame)
@@ -94,24 +94,40 @@ class UI():
 
         new_list = db.list_all(db.connectDB())
         for item in new_list:
-            print(item)
             self.notes_list.insert('',index='end', values=(item[0],item[2]))
 
     def delete_note(self):
-        selected = self.selection_box.curselection()
-        titles = []
-        for index in selected:
-            row = db.get_row(db.connectDB(), index)
-            if row:
-                title = row[2]
-                titles.append(title)
-        
+        selected = self.notes_list.selection()
+        if selected:
+            titles = []
+            for index in selected:
+                row = db.get_row(db.connectDB(), self.notes_list.item(index).get('values')[0])
+                if row:
+                    titles.append(self.notes_list.item(index).get('values')[1])
             
-        result=tkinter.messagebox.askquestion('Confirmation',f'Are you sure you want to delete: {titles}')
-        if result == 'yes':
-            #implement deletion in the database
-            for items in selected[::-1]:
-                self.selection_box.delete(items)
-                print(items)
+                
+            result=tkinter.messagebox.askquestion('Confirmation',f'Are you sure you want to delete: {titles}')
+            if result == 'yes':
+                for items in selected[::-1]:
+                    db.remove_row(db.connectDB(), self.notes_list.item(index).get('values')[0])
+                    self.notes_list.delete(items)
+                    print(items)
+            else:
+                pass
+        selected = None
+
+    def edit_note(self):
+        selection = self.notes_list.selection()
+        self.editor_text.delete(1.0, tk.END)
+        if len(selection) > 1:
+            self.editor_text.insert(1.0, 'YOU CAN ONLY EDIT ONE NOTE AT A TIME! CHECK YOUR SELECTIONS IN THE BOTTOM LEFT.')
         else:
-            pass
+            self.editor_text.insert(1.0, str(db.get_row(db.connectDB(), self.notes_list.item(selection[0]).get('values')[0])[1]))
+        selection = None
+
+    def save_note(self):
+        data = self.editor_text.get(1.0, tk.END)
+        db_id = self.notes_list.item(self.notes_list.selection()[0]).get('values')[0]
+        db.edit_data(db.connectDB(), data, db_id)
+        data = None
+        db_id = None
