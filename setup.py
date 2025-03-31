@@ -17,7 +17,8 @@ def setup():
                     (note_id INTEGER PRIMARY KEY AUTOINCREMENT,
                     encrypted_data BLOB,
                     title TEXT NOT NULL,
-                    salt BLOB)''')
+                    salt BLOB,
+                    hash BLOB)''')
     db.close()
 
     with open('setup_complete.flag', 'w') as file:

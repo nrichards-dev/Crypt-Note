@@ -11,7 +11,6 @@ def main():
     if not path.exists('setup_complete.flag'):
         setup.setup()
         print('Setup complete!')
-    
     display_menu = ui_menu.UI()
     
 
